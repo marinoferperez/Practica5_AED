@@ -357,6 +357,8 @@ dirty_iris %>%
     y = "Longitud del pétalo",
     color = "Outlier"
   ) 
+
+ggsave("./results/outliers_petal_length.png")
 ```
 
 La gráfica generada complementa el análisis del ejercicio anterior. Lo que más destaca es el criterio utilizado por el método de percentiles, que refleja como considera atípicos los valores que están situados por debajo del percentil 5 y por encima del 95. Por ello, identifica también valores que no están especialmente alejados del resto, siendo el método que más outliers detecta al forzar que un 10% del conjunto de datos se considere atípico.
