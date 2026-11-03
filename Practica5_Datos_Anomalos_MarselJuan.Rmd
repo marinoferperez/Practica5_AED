@@ -338,9 +338,30 @@ Representa gráficamente los datos de `Petal.Length` (distribución de puntos en
 
 Nota: usa en `geom_point` con la opción `position='jitter'` para mejorar la legibilidad del gráfico.
 
-```{r Solucion ejercicio 8, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+El procedimiento seguido es bastante similar al del ejercicio anterior, solo que aqui consideramos todos los valores a excepción de los `NA`. Tras filtrar con `filter()`, graficamos el conjunto de valores clasificando lo considerado por cada método como valor atípico con un color distinto al utilizado para el resto de valores.
 
+```{r Solucion ejercicio 8, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+dirty_iris %>%
+  select(Petal.Length, starts_with("Petal.Length_")) %>%
+  pivot_longer(
+    cols = starts_with("Petal.Length_"),
+    names_to = "Metodo",
+    values_to = "Outlier"
+  ) %>%
+  filter(!is.na(Outlier)) %>%
+  ggplot(aes(x = Metodo, y = Petal.Length, color = Outlier)) +
+  geom_point(position = "jitter") +
+  labs(
+    title = "Detección de outliers en la variable Petal.Length",
+    x = "Método de detección",
+    y = "Longitud del pétalo",
+    color = "Outlier"
+  ) 
 ```
+
+La gráfica generada complementa el análisis del ejercicio anterior. Lo que más destaca es el criterio utilizado por el método de percentiles, que refleja como considera atípicos los valores que están situados por debajo del percentil 5 y por encima del 95. Por ello, identifica también valores que no están especialmente alejados del resto, siendo el método que más outliers detecta al forzar que un 10% del conjunto de datos se considere atípico.
+
+En la regla de las 3 sigma vuelve a mostrarse menos agresiva con outliers, ya que considera al punto con longitud de petalo igual a 14 como típico cuando el resto no lo hace. 
 
 # Imputación de datos
 
