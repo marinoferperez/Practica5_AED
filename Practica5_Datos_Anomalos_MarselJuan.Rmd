@@ -229,15 +229,52 @@ Escribe una función que detecte los outliers de un vector $x$ para cada uno de 
 
 - **Percentiles** `reglapercentil(x)`: Cualquier valor que esté fuera del rango del percentil 5% y 95% se puede considerar como atípico. Usa la función `quantile` para calcular los percentiles.
 
+Siguiendo la definición de cada uno de los metodos de detección de outliers indicados en el enunciado, construimos las funciones utilizando la eliminación de valores `NA` para los distintos cálculos (`na.rm = TRUE`), evitando así obtener resultados iguales a `NA`.
+
+```{r , include = FALSE}
+# Regla 3 sigma
+
+reglasigma <- function(x) {
+  media <- mean(x, na.rm = TRUE)
+  desviacion <- sd(x, na.rm = TRUE)
+
+  abs(x - media) > 3 * desviacion
+}
+
+# Identificador Hampel
+
+reglahampel <- function(x) {
+  mediana <- median(x, na.rm = TRUE)
+  desviacion <- madm(x)
+
+  abs(x - mediana) > 3 * desviacion
+}
+
+# Regla boxplot
+
+reglaboxplot <- function(x) {
+  q1 <- quantile(x, 0.25, na.rm = TRUE)
+  q3 <- quantile(x, 0.75, na.rm = TRUE)
+  rango <- IQR(x, na.rm = TRUE)
+
+  (x < q1 - 1.5 * rango) | (x > q3 + 1.5 * rango) # rango intercuartiico
+}
+
+# Percentiles
+
+reglapercentil <- function(x) {
+  p5 <- quantile(x, 0.05, na.rm = TRUE)
+  p95 <- quantile(x, 0.95, na.rm = TRUE)
+
+  (x < p5) | (x > p95)
+}
+```
+
 ## Ejercicio 6: Detección de outliers
 
 Utiliza la función `mutate` y `across` para identificar los outliers en la variable `Petal.Length` con todos los métodos de detección de outliers implementados. Genera una columna nueva para cada método. Nota: podría extenderse la aplicación a todas las variables numéricas usando también `mutate`, `across` y `where`.
 
-```{r Solucion ejercicio 6, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 
-
-
-```
 
 ## Ejercicio 7: Comparativa de los métodos de detección de outliers
 
