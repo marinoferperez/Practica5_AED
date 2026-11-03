@@ -274,6 +274,23 @@ reglapercentil <- function(x) {
 
 Utiliza la función `mutate` y `across` para identificar los outliers en la variable `Petal.Length` con todos los métodos de detección de outliers implementados. Genera una columna nueva para cada método. Nota: podría extenderse la aplicación a todas las variables numéricas usando también `mutate`, `across` y `where`.
 
+Como no se indica nada a cerca de qué dataset utilizar, procesamos `dirty_iris` ya que en `clean_iris` no tenemos valores perdidos y, además, podriamos estar modificandolo incorrectamente y, por tanto, impidiendo el acceso a dichos datos para su recuperacion posteriormente.
+
+Con `mutate()` y `across()` aplicamos los 4 métodos sobre la variable `Petal.Length` y generamos una columna nueva para cada uno de ellos. Como las funciones devuelven `TRUE` o `FALSE` según si una observación se considera atípica o no, podemos identificar fácilmente los outliers detectados por cada método.
+
+```{r Solucion ejercicio 6, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+dirty_iris <- dirty_iris %>% mutate(across(.cols = Petal.Length, .fns = list(
+      sigma = ~ reglasigma(.),
+      hampel = ~ reglahampel(.),
+      boxplot = ~ reglaboxplot(.),
+      percentil = ~ reglapercentil(.)
+    )
+  ))
+
+select(dirty_iris, Petal.Length, starts_with("Petal.Length"))
+```
+
+Además, observamos que sigue habiendo valores `NA`, ya que, las funciones creadas no los tienen en cuenta para los calculos pero no los eliminan. 
 
 
 ## Ejercicio 7: Comparativa de los métodos de detección de outliers
@@ -281,11 +298,6 @@ Utiliza la función `mutate` y `across` para identificar los outliers en la vari
 En los métodos de detección de outliers analizados, examina los resultados comparando:
 
 - Número de outliers detectados por método.
-- Los valores etiquetados como outliers (ordenados de menor a mayor).
-
-```{r Solucion ejercicio 7, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
-
-```
 
 ## Ejercicio 8: Representación gráfica
 
