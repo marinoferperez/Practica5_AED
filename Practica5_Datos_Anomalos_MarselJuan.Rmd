@@ -177,6 +177,46 @@ Empleado la función `summarise y across`, calcula la media, la desviación típ
 - Para obtener el valor MADM, escribe una función `madm(x)` que sea robusta a la presencia de valores NA. Recuerda que el MADM se calcula como $1.4826\cdot\textrm{median}(|x - \textrm{median(x)}|)$.
 - Compara los resultados para los dos conjuntos en la variable `Petal.Length`.
 
+Primero, definimos la función `madm()` tal y como se indica en el enunciado. Además, utilizamos `na.rm = TRUE` para evitar que los valores perdidos afecten al cálculo.
+
+```{r , include = TRUE}
+madm <- function(x) {
+  mediana <- median(x, na.rm = TRUE)
+  1.4826 * median(abs(x - mediana), na.rm = TRUE)
+}
+```
+
+Posteriormente, creamos una función generica `stats()` para calcular los estadisticos de ambos conjuntos utilizando `summarise()` y `across(where(is.numeric))`.
+
+```{r , include = TRUE}
+stats <- function(data) {
+  data %>% summarise(across(.cols = where(is.numeric), .fns = list(
+                     media = ~ mean(., na.rm = TRUE),
+                     sd = ~ sd(., na.rm = TRUE),
+                     mediana = ~ median(., na.rm = TRUE),
+                     madm = ~ madm(.),
+                     IQR = ~ IQR(., na.rm = TRUE)
+                   )))
+}
+
+stats_clean <- stats(clean_iris)
+stats_dirty <- stats(dirty_iris)
+
+stats_clean
+stats_dirty
+```
+
+Al haber calculado 5 medidas estadísticas para cada una de las cuatro variables numéricas del dataset, los nuevos data frames `stats_clean` y `stats_dirty` contienen 20 columnas cada uno. Por tanto, para comparar los resultados de `Petal.Length`, seleccionamos las cinco columnas correspondientes a sus estadísticos utilizando `select()` e identificandolas como aquellas cuyos nombres comiencen por el de la variable original mediante `starts_with("Petal.Length")`.
+
+```{r , include = TRUE}
+stats_clean %>% select(starts_with("Petal.Length"))
+stats_dirty %>% select(starts_with("Petal.Length"))
+```
+
+Los resultados obtenidos muestran que, aunque la media, la desviación y el IQR, son distintos para ambos, la mediana y el MADM se mantienen idénticos. En especial, estas dos ultimas son medidas que, teoricamente, son más robustas y menos sensibles a valores atípicos, que aún siguen estando presentes en nuestro dataset.
+
+Por otro lado, podemos decir que la media y la desviación típica son más sensibles a la presencia de outliers.
+
 ## Ejercicio 5: Métodos de detección de outliers
 
 Escribe una función que detecte los outliers de un vector $x$ para cada uno de los siguientes métodos de detección de outliers univariantes (todas las funciones tienen que ser robustas a la presencia de valores NA).
@@ -188,21 +228,6 @@ Escribe una función que detecte los outliers de un vector $x$ para cada uno de 
 - **Regla boxplot** `reglaboxplot(x)`: A partir de los datos se calcula su diagrama de caja (boxplot) y se definen como datos típicos superiores hasta el cuartil 75%, $x_s$; datos típicos inferiores hasta el cuartil 25%, $x_i$; y la dispersión se define como el rango intercuartílico ($IQR= x_s-x_i$). Valores por encima de $x_s+1.5\cdot IQR$ o por debajo de $x_i-1.5\cdot IQR$ se consideran outliers. Usa la función `quantile` para calcular los cuartiles.
 
 - **Percentiles** `reglapercentil(x)`: Cualquier valor que esté fuera del rango del percentil 5% y 95% se puede considerar como atípico. Usa la función `quantile` para calcular los percentiles.
-
-```{r , include = FALSE}
-# Regla 3 sigma
-
-
-# Identificador Hampel
-
-
-
-# Regla boxplot
-
-
-# Percentiles
-
-```
 
 ## Ejercicio 6: Detección de outliers
 
