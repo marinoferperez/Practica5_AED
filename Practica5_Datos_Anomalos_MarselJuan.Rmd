@@ -139,7 +139,7 @@ Como se indica en el enunciado, con `complete.cases` obtenemos un vector de bool
 num_completas <- sum(complete.cases(dirty_iris))
 num_completas
 # porcentaje de observaciones
-porc_completas <- num_completas / nrow(dirty_iris) 
+porc_completas <- num_completas / nrow(dirty_iris) * 100
 porc_completas
 ```
 
@@ -147,12 +147,18 @@ De ambos resultados, nos quedamos con el porcentaje, que indica que más de un 3
 
 - Emplea después la función `na.omit` para quedarnos solo con las filas con datos completos en un nuevo data frame `clean_iris`.
 
-```{r Solucion ejercicio 3, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
-# Creamos un nuevo data frame con las observaciones completas
-clean_iris <- na.omit(dirty_iris)
+Observando el manual de `na.omit`, vemos que devuelve un nuevo dataframe. Por tanto, el resultado de esta función lo asignamos al nuevo dataset limpio `clean_iris`.
 
-# Comprobamos sus dimensiones
+```{r Solucion ejercicio 3, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+clean_iris <- na.omit(dirty_iris)
+sum(is.na(clean_iris))
+```
+
+Tras limpiar el dataset, podemos ver que el numero de `NA` es 0.
+
+```{r Solucion ejercicio 3, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 dim(clean_iris)
+dim(dirty_iris)
 ```
 
 # Detección de outliers univariante
@@ -170,10 +176,6 @@ Empleado la función `summarise y across`, calcula la media, la desviación típ
 - Ten en cuenta que no se puede realizar un análisis estadístico con datos faltantes, pero en la mayoría de los casos se puede optar por no considerar dichos valores al realizar los cálculos (parámetro `na.rm=TRUE`).
 - Para obtener el valor MADM, escribe una función `madm(x)` que sea robusta a la presencia de valores NA. Recuerda que el MADM se calcula como $1.4826\cdot\textrm{median}(|x - \textrm{median(x)}|)$.
 - Compara los resultados para los dos conjuntos en la variable `Petal.Length`.
-
-```{r , include = TRUE}
-
-```
 
 ## Ejercicio 5: Métodos de detección de outliers
 
