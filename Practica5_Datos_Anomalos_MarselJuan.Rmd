@@ -299,6 +299,39 @@ En los métodos de detección de outliers analizados, examina los resultados com
 
 - Número de outliers detectados por método.
 
+Para comparar los cuatro métodos, contamos los valores `TRUE` de las columnas del ejercicio anterior. Para ello, utilizamos `summarise()` sin considerar los valores `NA`.
+
+```{r Solucion ejercicio 7, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+dirty_iris %>% summarise(across(starts_with("Petal.Length_"), ~ sum(., na.rm = TRUE)))
+```
+
+A partir de los resultados, podemos confirmar que, tal y como dice la teoria, la regla **3 sigma** es la menos agresiva y la regla de los **percentiles** la más fuerte.
+
+- Los valores etiquetados como outliers (ordenados de menor a mayor).
+
+Primero, utilizamos `pivot_longer()` para juntar las cuatro nuevas columnas en una sola. Después, con `filter()` nos quedamos únicamente con los valores identificados como outliers y con `group_by()` los agrupamos según el método.
+
+Finalmente, con `summarise()` contamos los outliers con `n()` y mostramos sus valores ordenados de menor a mayor mediante `sort()`.
+
+```{r Solucion ejercicio 7, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+dirty_iris %>%
+  select(Petal.Length, starts_with("Petal.Length_")) %>%
+  pivot_longer(
+    cols = starts_with("Petal.Length_"),
+    names_to = "Metodo",
+    values_to = "Outlier"
+  ) %>%
+  filter(Outlier == TRUE) %>%
+  group_by(Metodo) %>%
+  summarise(
+    Num_Outliers = n(),
+    Valores = paste(sort(Petal.Length), collapse = ", ")
+  )
+```
+A partir de los resultados, observamos que **Hampel y boxplot coinciden** tanto en el número de outliers como en los valores considerados como atípicos. Con la regla de las **3 sigma** se logra identificar los valores `23` y `63`, que coinciden con dos de los registrados por los métodos anteriores, pero no el otro restante, posiblemente por ser menos agresiva que las otras dos técnicas.
+
+Por otro lado, el método de percentiles detecta **11** outliers, incluyendo valores bastante menos extremos (`0.82` o `0.925`). Esto se debe al criterio que utiliza para discriminar atípicos.
+
 ## Ejercicio 8: Representación gráfica
 
 Representa gráficamente los datos de `Petal.Length` (distribución de puntos en el eje $y$) para todas las reglas de detección implementadas (repartidas en el eje $x$) mostrando los valores identificados como típicos y los identificados como outliers en diferente color. Usa la función `pivot_longer` para poder agrupar por reglas y colorear los outliers fácilmente.
