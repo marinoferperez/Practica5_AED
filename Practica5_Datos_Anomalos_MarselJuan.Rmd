@@ -2,15 +2,15 @@
 title: "Práctica 5. Datos Anómalos"
 subtitle: "Análisis Exploratorio de Datos, Máster en Ciencia de Datos - UV"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+    number_sections: no
   html_document:
     echo: yes
     number_sections: no
     theme: lumen
     toc: yes
-  pdf_document:
-    toc: yes
-    toc_depth: 3
-    number_sections: no
 ---
 
 Práctica 5 - Marino Fernández Pérez
@@ -82,7 +82,7 @@ Si clickamos en el nombre de cada una de las variables, se ordenan los valores r
 
 Ordenando `Sepal.length` observamos valores que parecen alejarse bastante de la distribución de los datos así como **0.00*, que no tienen sentido ni aportan información ya que es impsoible que la longitud sea 0. Este mismo patrón se repite en las otras variables, aunque, además, en `Sepal.width`, hay un registro con valor negativo, que tampoco es representativo y no parece ser correcto.
 
-```{r Solucion ejercicio 1, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+```{r Solucion ejercicio 1, include=TRUE, echo=TRUE, eval=FALSE, results=TRUE}
 View(dirty_iris)
 ```
 
@@ -111,14 +111,14 @@ Siguiendo el enunciado, utilizamos `mutate()` y, para seleccionar unicamente las
 
 Por último, la transformación aplicada es identificar tanto los valores especiales indicados como los negativos o iguales a 0 por `NA`, utilizando `ifelse()` para evitar modificar aquellos que sí sean correctos.
 
-```{r Solucion ejercicio 2, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+```{r Solucion ejercicio 2_1, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 # DEBEMOS ELIMINAR TAMBIEN LOS VALROES IGUALES A CERO YA QUE SE TRATA DE LONGITUDES DE PARTES DE UNA FLOR. NO PUEDEN SER O
 dirty_iris <- dirty_iris %>% mutate(across(where(is.numeric), ~ ifelse(!is.finite(.) | . <= 0, NA, .)))
 ```
 
 Para verificar la sustitución, utilizamos `summarise()` y `across()` para contar, en cada columna, los valores negativos o iguales a cero y los valores infinitos o `NaN`.
 
-```{r Solucion ejercicio 2, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+```{r Solucion ejercicio 2_2, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 # comprobacion valores negativos ni ceros
 dirty_iris %>% summarise(across(where(is.numeric), ~ sum(. <= 0, na.rm = TRUE)))
 
@@ -134,7 +134,7 @@ Ambas comprobaciones devuelven **0 en todas las variables**, lo que confirma que
 
 Como se indica en el enunciado, con `complete.cases` obtenemos un vector de booleanos que contiene solamente aquellas muestras que no tengan datos perdidos, es decir, `NA`. A partir del vector, con `sum` se suman los valores **TRUE** y devuelve el número de registros completos, y para calcular el porcentaje, se divide este valor entre el número total de muestras del dataset.
 
-```{r Solucion ejercicio 3, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+```{r Solucion ejercicio 3_1, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 # num de observaciones
 num_completas <- sum(complete.cases(dirty_iris))
 num_completas
@@ -149,14 +149,14 @@ De ambos resultados, nos quedamos con el porcentaje, que indica que más de un 3
 
 Observando el manual de `na.omit`, vemos que devuelve un nuevo dataframe. Por tanto, el resultado de esta función lo asignamos al nuevo dataset limpio `clean_iris`.
 
-```{r Solucion ejercicio 3, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+```{r Solucion ejercicio 3_2, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 clean_iris <- na.omit(dirty_iris)
 sum(is.na(clean_iris))
 ```
 
 Tras limpiar el dataset, podemos ver que el numero de `NA` es 0.
 
-```{r Solucion ejercicio 3, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+```{r Solucion ejercicio 3_3, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 dim(clean_iris)
 dim(dirty_iris)
 ```
@@ -301,7 +301,7 @@ En los métodos de detección de outliers analizados, examina los resultados com
 
 Para comparar los cuatro métodos, contamos los valores `TRUE` de las columnas del ejercicio anterior. Para ello, utilizamos `summarise()` sin considerar los valores `NA`.
 
-```{r Solucion ejercicio 7, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+```{r Solucion ejercicio 7_1, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 dirty_iris %>% summarise(across(starts_with("Petal.Length_"), ~ sum(., na.rm = TRUE)))
 ```
 
@@ -313,7 +313,7 @@ Primero, utilizamos `pivot_longer()` para juntar las cuatro nuevas columnas en u
 
 Finalmente, con `summarise()` contamos los outliers con `n()` y mostramos sus valores ordenados de menor a mayor mediante `sort()`.
 
-```{r Solucion ejercicio 7, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
+```{r Solucion ejercicio 7_2, include=TRUE, echo=TRUE, eval=TRUE, results=TRUE}
 dirty_iris %>%
   select(Petal.Length, starts_with("Petal.Length_")) %>%
   pivot_longer(
